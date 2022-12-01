@@ -4,18 +4,18 @@ import java.io.File
 
 fun main() {
     println("Oppgave 1: ${Day1().task1()}")
+    println("Oppgave 2: ${Day1().task2()}")
 }
 
 class Day1 {
-    fun task1(): Int {
+    private fun fetchElves(): Elves {
         val urlToFile = this.javaClass.getResource("/day1/input.txt")
         val file = File(urlToFile?.toURI() ?: throw IllegalStateException("No such file $urlToFile"))
         val lines = file.useLines {
             mapToElves(it)
         }
         val elves = Elves(lines)
-        val elfWithMostCalories = elves.mostCalories()
-        return elfWithMostCalories.totalCalories()
+        return elves
     }
 
     private fun mapToElves(it: Sequence<String>): List<Elf> {
@@ -31,5 +31,16 @@ class Day1 {
             }
         }
         return elvesList.toList()
+    }
+
+    fun task1(): Int {
+        val elves = fetchElves()
+        val elfWithMostCalories = elves.mostCalories()
+        return elfWithMostCalories.totalCalories()
+    }
+
+    fun task2(): Int {
+        val elves = fetchElves()
+        return elves.topThreeSum()
     }
 }

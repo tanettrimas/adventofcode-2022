@@ -13,6 +13,13 @@ internal class ElfTest {
     }
 
     @Test
+    internal fun `cannot have negative calories`() {
+        assertThrows<IllegalArgumentException> {
+            Elf(1000, -1)
+        }
+    }
+
+    @Test
     internal fun `can get total calories`() {
         assertEquals(6000, Elf(1000, 2000, 3000).totalCalories())
         assertEquals(4000, Elf(4000).totalCalories())
@@ -20,4 +27,6 @@ internal class ElfTest {
         assertEquals(24000, Elf(7000, 8000, 9000).totalCalories())
         assertEquals(10000, Elf(10000).totalCalories())
     }
+
+
 }

@@ -34,8 +34,53 @@ class Scoreboard {
 }
 
 enum class ScoreResult(val score: Int) {
-    Win(6), Draw(3), Lose(0)
+    Win(6), Draw(3), Lose(0);
+
+    companion object {
+        fun from(char: Char) = when(char) {
+            'X' -> Lose
+            'Y' -> Draw
+            'Z' -> Win
+            else -> throw IllegalArgumentException("Cannot compute scoreresult from char $char")
+        }
+    }
+
+    fun toGameOption(option: GameOption) = when(this) {
+        Win -> GameOption.from(option.loses())
+        Draw -> option
+        Lose -> GameOption.from(option.beats())
+    }
 }
+
+sealed class GameOption(val type: GameType) {
+    companion object {
+        fun from(gameType: GameType) = when(gameType) {
+            GameType.Rock -> Rock()
+            GameType.Paper -> Paper()
+            GameType.Scissor -> Scissor()
+        }
+    }
+
+    fun beats(other: GameType) = other == beats()
+    abstract fun beats(): GameType
+    abstract fun loses(): GameType
+}
+
+class Rock: GameOption(GameType.Rock) {
+    override fun beats() = GameType.Scissor
+    override fun loses() = GameType.Paper
+}
+
+class Paper: GameOption(GameType.Paper) {
+    override fun beats() = GameType.Rock
+    override fun loses() = GameType.Scissor
+}
+
+class Scissor: GameOption(GameType.Scissor) {
+    override fun beats() = GameType.Paper
+    override fun loses() = GameType.Rock
+}
+
 
 enum class GameType(val score: Int) {
     Rock(1), Paper(2), Scissor(3);
@@ -48,11 +93,8 @@ enum class GameType(val score: Int) {
             else -> throw IllegalArgumentException("Invalid game type with char $char")
         }
     }
-    fun beats(other: GameType) = when(this) {
-        Rock -> other == Scissor
-        Paper -> other == Rock
-        Scissor -> other == Paper
-    }
+
+    fun toGameOption() = GameOption.from(this)
 }
 
 class Game(private val type: GameType) {
@@ -65,7 +107,7 @@ class Game(private val type: GameType) {
         if (this.type == other.type) {
             return draw(other)
         }
-        if (this.type.beats(other.type)) {
+        if (this.type.toGameOption().beats(other.type)) {
             return winner(other)
         }
         return loser(other)

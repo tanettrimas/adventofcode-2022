@@ -20,5 +20,13 @@ fun task1() {
 }
 
 fun task2() {
-
+    val scoreboard = Scoreboard();
+    val file = File({}.javaClass.getResource("/day2/input.txt")?.file ?: throw IllegalStateException())
+    file.forEachLine {
+        val (opponent, player) = it.split(" ")
+        val opponentGame = GameType.toGameType(opponent.first()).toGameOption()
+        val playergame = ScoreResult.from(player.first()).toGameOption(opponentGame)
+        scoreboard.play(opponentGame.type, playergame.type)
+    }
+    println(scoreboard.playerScore())
 }

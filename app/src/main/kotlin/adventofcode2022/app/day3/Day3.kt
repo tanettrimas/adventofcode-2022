@@ -17,8 +17,7 @@ fun task2() {
     val file = File({}.javaClass.getResource("/day3/input.txt")?.file ?: throw IllegalStateException())
     val priorities = file.useLines {
         it.chunked(3)
-            .map { chunkedList -> chunkedList.joinToString(separator = "\n") }
-            .sumOf { GroupedRucksack(it).priorities() }
+            .sumOf { list -> GroupedRucksack(list.joinToString(separator = "\n")).priorities() }
     }
     println(priorities)
 }

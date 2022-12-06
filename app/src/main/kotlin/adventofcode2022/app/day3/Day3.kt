@@ -1,6 +1,18 @@
 package adventofcode2022.app.day3
 
+import java.io.File
+
 fun main() {
+    task1()
+}
+
+fun task1() {
+    val file = File({}.javaClass.getResource("/day3/input.txt")?.file ?: throw IllegalStateException())
+    val priorities = file.useLines { it.map(::Rucksack).sumOf(Rucksack::priorities) }
+    println(priorities)
+}
+
+fun task2() {
 
 }
 
@@ -10,7 +22,7 @@ class Rucksack(input: String) {
 
         private fun createWordScoreMap(): Map<Char, Int> {
             val map = mutableMapOf<Char, Int>()
-            ('a'.. 'z').forEachIndexed { index, letter ->
+            ('a'..'z').forEachIndexed { index, letter ->
                 map[letter] = (index + 1)
             }
             ('A'..'Z').forEachIndexed { index, letter ->
@@ -29,7 +41,8 @@ class Rucksack(input: String) {
     }
 
     fun priorities(): Int {
-        val commonWords = parts.component1().split("").toSet().intersect(parts.component2().split("").toSet()).filter { it.isNotEmpty() }
+        val commonWords = parts.component1().split("").toSet().intersect(parts.component2().split("").toSet())
+            .filter { it.isNotEmpty() }
         return commonWords.sumOf { wordsScoreMap[it.first()] ?: 0 }
     }
 

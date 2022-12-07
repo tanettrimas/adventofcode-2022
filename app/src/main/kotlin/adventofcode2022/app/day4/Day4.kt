@@ -4,6 +4,7 @@ import java.io.File
 
 fun main() {
     task1()
+    task2()
 }
 
 fun task1() {
@@ -17,4 +18,17 @@ fun task1() {
         }.count()
     }
     println(count)
+}
+
+fun task2() {
+    val file = File({}.javaClass.getResource("/day4/input.txt")?.file ?: throw IllegalStateException())
+    val totalIntersections = file.useLines {
+        it.filter { entry ->
+            val (first, second) = entry.split(",")
+            val firstPair = first.split("-").map(String::toInt)
+            val secondPair = second.split("-").map(String::toInt)
+            ElfPair(firstPair[0], firstPair[1]).doesIntersect(ElfPair(secondPair[0], secondPair[1]))
+        }.count()
+    }
+    println(totalIntersections)
 }

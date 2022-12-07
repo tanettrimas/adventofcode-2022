@@ -20,4 +20,9 @@ class ElfPair(val start: Int, val end: Int) {
             otherRangeset.containsAll(rangeSet)
         }
     }
+
+    fun doesIntersect(other: ElfPair): Boolean {
+        val intersection = range.toSet() intersect other.range.toSet()
+        return intersection.isNotEmpty()
+    }
 }

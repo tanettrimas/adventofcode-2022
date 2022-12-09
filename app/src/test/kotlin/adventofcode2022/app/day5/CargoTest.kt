@@ -10,7 +10,8 @@ internal class CargoTest {
             mapOf(
                 1 to listOf('A', 'B', 'C'),
                 2 to listOf('D', 'E', 'F')
-            )
+            ),
+            CargoType.Stack
         )
         cargo.move(amount = 1, from = 2, to = 1)
         assertEquals("DE", cargo.top())
@@ -23,7 +24,8 @@ internal class CargoTest {
                 1 to listOf('N', 'Z'),
                 2 to listOf('D', 'C', 'M'),
                 3 to listOf('P')
-            )
+            ),
+            CargoType.Stack
         )
         cargo.move(amount = 1, from = 2, to = 1)
         cargo.move(amount = 3, from = 1, to = 3)

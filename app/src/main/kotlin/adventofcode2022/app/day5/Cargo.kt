@@ -1,23 +1,50 @@
 package adventofcode2022.app.day5
 
-import java.util.Stack
+enum class CargoType {
+    Stack, KeepOrder
+}
 
 
+typealias Transformer = (list: List<Char>) -> List<Char>
 
-class Cargo(crates: Map<Int, List<Char>>) {
+class Cargo(crates: Map<Int, List<Char>>, cargoType: CargoType) {
     fun move(amount: Int, from: Int, to: Int) = crateHolder.move(amount, from, to)
     fun top(): String {
         return crateHolder.top()
     }
 
-    private val crateHolder = CrateHolder(crates)
+    private fun toTransformer(type: CargoType): Transformer = when(type) {
+        CargoType.Stack ->  { list -> list.reversed() }
+        CargoType.KeepOrder -> { list -> list }
+    }
+
+    private val crateHolder = CrateHolder(crates, toTransformer(cargoType))
 }
 
-private class CrateHolder(crates: Map<Int, List<Char>>) {
+private class CrateHolder(crates: Map<Int, List<Char>>, private val transformer: Transformer) {
+
+    private inner class Crate(private val stack: MutableList<Char>) {
+        fun remove(amount: Int): List<Char> {
+            val times = amount.coerceAtMost(stack.size)
+            val toBe = stack.takeLast(times)
+            repeat(times) {
+                stack.removeLastOrNull()
+            }
+            return toBe
+        }
+
+        fun add(cargoCratesToBeAdded: List<Char>) {
+            stack.addAll(transformer(cargoCratesToBeAdded))
+        }
+        fun top(): Char? {
+            return stack.lastOrNull()
+        }
+    }
+
     private val database: Map<Int, Crate> = initialize(crates)
 
     private fun initialize(crates: Map<Int, List<Char>>) = crates.toSortedMap().mapValues { (_, value) ->
-        val stack: Stack<Char> = Stack()
+        val stack = mutableListOf<Char>()
         value.reversed().forEach { stack.add(it) }
         Crate(stack)
     }
@@ -36,20 +63,4 @@ private class CrateHolder(crates: Map<Int, List<Char>>) {
 }
 
 
-private class Crate(private val stack: Stack<Char>) {
-    fun remove(amount: Int): Crate {
-        val times = amount.coerceAtMost(stack.size)
-        val charStack = Stack<Char>()
-        repeat(times) {
-            charStack.add(stack.pop())
-        }
-        return Crate(charStack)
-    }
 
-    fun add(cargoCratesToBeAdded: Crate) {
-        cargoCratesToBeAdded.stack.forEach { stack.push(it) }
-    }
-    fun top(): Char? {
-        return stack.peek()
-    }
-}

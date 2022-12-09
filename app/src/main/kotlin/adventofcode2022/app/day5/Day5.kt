@@ -8,7 +8,7 @@ fun main() {
 }
 
 fun task1() {
-    val cargo = crateCargo()
+    val cargo = createCargo(CargoType.Stack)
     val file = File({}.javaClass.getResource("/day5/input.txt")?.file ?: throw IllegalStateException())
     file.forEachLine {
         cargo.instruction(it)
@@ -22,7 +22,7 @@ private fun Cargo.instruction(instruction: String) {
     this.move(amount = amount, from = source, to = destination)
 }
 
-fun crateCargo(): Cargo {
+fun createCargo(type: CargoType): Cargo {
     val crates = mapOf(
         1 to listOf(
             'G', 'J', 'Z'
@@ -99,9 +99,14 @@ fun crateCargo(): Cargo {
             'M',
         ),
     )
-    return Cargo(crates)
+    return Cargo(crates, type)
 }
 
 fun task2() {
-    //TODO("Not yet implemented")
+    val cargo = createCargo(CargoType.KeepOrder)
+    val file = File({}.javaClass.getResource("/day5/input.txt")?.file ?: throw IllegalStateException())
+    file.forEachLine {
+        cargo.instruction(it)
+    }
+    println(cargo.top())
 }

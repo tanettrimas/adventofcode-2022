@@ -66,7 +66,12 @@ private class Directory(val parent: Directory?, val name: String) {
         return subDirectories.sumOf { it.findTotalSize() } + files.sumOf { it.size }
     }
 
-    fun findTotal(size: Long) = finn(size, this, mutableListOf()).sumOf { it.findTotalSize() }
+    fun findTotal(size: Long) = finn(size, this, mutableListOf())
+        .apply {
+            if (this@Directory.findTotalSize() <= size) {
+                add(this@Directory)
+            }
+        }.sumOf { it.findTotalSize() }
 
     private fun finn(size: Long, directory: Directory, list: MutableList<Directory>): MutableList<Directory> {
         for (subDirectory in directory.subDirectories) {

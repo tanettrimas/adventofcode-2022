@@ -91,4 +91,10 @@ internal class FileSystemTest {
         setupFilesystem()
         assertEquals(95437, fileSystem.findTotalWithCapacity(100000))
     }
+
+    @Test
+    fun task2Test() {
+        setupFilesystem()
+        assertEquals(24933642, fileSystem.findTotalSizeForDiskUpdate())
+    }
 }

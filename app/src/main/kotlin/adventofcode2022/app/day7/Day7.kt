@@ -4,6 +4,15 @@ import java.io.File
 
 fun main() {
     task1()
+    task2()
+}
+
+fun task2() {
+    val file = File({}.javaClass.getResource("/day7/input.txt")?.file ?: throw IllegalStateException())
+    val fileSystem = FileSystem()
+    file.forEachLine { it.interpretCommand(fileSystem) }
+    fileSystem.moveToRoot()
+    println(fileSystem.findTotalSizeForDiskUpdate())
 }
 
 fun task1() {

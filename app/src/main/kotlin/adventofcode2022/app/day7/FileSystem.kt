@@ -6,6 +6,11 @@ private const val ROOT_DIRECTORY_NAME = "/"
 private const val MOVE_UP_NAME = ".."
 
 class FileSystem {
+    companion object {
+        private const val TOTAL_DISK_SPACE = 70000000
+        private const val MINIMUM_UPDATE_SPACE = 30000000
+    }
+
     private val ROOT_DIRECTORY: Directory = Directory(parent = null, name = ROOT_DIRECTORY_NAME)
     private var currentWorkingDirectory: Directory = ROOT_DIRECTORY
 
@@ -38,12 +43,27 @@ class FileSystem {
         currentWorkingDirectory = ROOT_DIRECTORY
     }
 
+    private fun usedSpace(): Long {
+        return ROOT_DIRECTORY.findTotalSize()
+    }
+
     fun hasFile(name: String) = currentWorkingDirectory.hasFile(name = name)
+
     fun createFile(name: String, size: Long) = currentWorkingDirectory.createFile(name = name, size = size)
     fun createDirectory(name: String) = currentWorkingDirectory.createDirectory(name = name)
-
     fun findTotalSize() = currentWorkingDirectory.findTotalSize()
-    fun findTotalWithCapacity(maxSize: Long) = currentWorkingDirectory.findTotal(maxSize)
+
+    fun findTotalWithCapacity(maxSize: Long) = currentWorkingDirectory.findDirectories {
+        it.findTotalSize() <= maxSize
+    }.sumOf { it.findTotalSize() }
+
+    fun findTotalSizeForDiskUpdate(): Long {
+        val spaceRequiredForUpdate = MINIMUM_UPDATE_SPACE - (TOTAL_DISK_SPACE - usedSpace())
+
+        return currentWorkingDirectory.findDirectories {
+            it.findTotalSize() >= spaceRequiredForUpdate
+        }.minBy { it.findTotalSize() }.findTotalSize()
+    }
 }
 
 private class Directory(val parent: Directory?, val name: String) {
@@ -66,21 +86,26 @@ private class Directory(val parent: Directory?, val name: String) {
         return subDirectories.sumOf { it.findTotalSize() } + files.sumOf { it.size }
     }
 
-    fun findTotal(size: Long) = finn(size, this, mutableListOf())
-        .apply {
-            if (this@Directory.findTotalSize() <= size) {
-                add(this@Directory)
-            }
-        }.sumOf { it.findTotalSize() }
+    fun findDirectories(predicate: (directory: Directory) -> Boolean) =
+        finn(this, mutableListOf(), predicate).toMutableList()
+            .apply {
+                if (predicate(this@Directory)) {
+                    add(this@Directory)
+                }
+            }.toList()
 
-    private fun finn(size: Long, directory: Directory, list: MutableList<Directory>): MutableList<Directory> {
+    private fun finn(
+        directory: Directory,
+        list: MutableList<Directory>,
+        predicate: (directory: Directory) -> Boolean
+    ): List<Directory> {
         for (subDirectory in directory.subDirectories) {
-            if (subDirectory.findTotalSize() <= size) {
+            if (predicate(subDirectory)) {
                 list.add(subDirectory)
             }
-            finn(size, subDirectory, list)
+            finn(subDirectory, list, predicate)
         }
-        return list
+        return list.toList()
     }
 
     fun getSubDirectory(name: String) =

@@ -56,7 +56,7 @@ class TreeStructure(input: String) {
 
     fun scienicScore(): Int {
         val flattenedTrees = trees.flatten()
-        val max = flattenedTrees.maxOf {tree ->
+        val max = flattenedTrees.maxOf { tree ->
             val directions = getDirections(tree)
             val viewingTop = viewingDistance(tree, directions.top.reversed())
             val viewingBottom = viewingDistance(tree, directions.bottom)
@@ -67,20 +67,12 @@ class TreeStructure(input: String) {
         return max
     }
 
-    private fun getDirections(tree: Tree): Directions {
-        val row = row(tree.position)
-        val column = column(tree.position)
-
-        val left = row.slice(tree.left())
-        val right = row.slice(tree.right())
-        val top = column.slice(tree.top())
-        val bottom = column.slice(tree.bottom())
-        return Directions(top = top, bottom = bottom, left = left, right = right)
-    }
+    private fun getDirections(tree: Tree) =
+        Directions(tree = tree, row = row(tree.position), column = column(tree.position))
 
     private fun viewingDistance(tree: Tree, list: List<Tree>): Int {
         var distance = 0
-        run breaking@ {
+        run breaking@{
             list.forEach {
                 if (it.height >= tree.height) {
                     distance++
@@ -96,7 +88,12 @@ class TreeStructure(input: String) {
     fun visible() = visibleEdges() + visibleInterior()
 }
 
-private class Directions(val top: List<Tree>, val bottom: List<Tree>, val left: List<Tree>, val right: List<Tree>)
+private class Directions(tree: Tree, row: List<Tree>, column: List<Tree>) {
+    val left = row.slice(tree.left())
+    val right = row.slice(tree.right())
+    val top = column.slice(tree.top())
+    val bottom = column.slice(tree.bottom())
+}
 
 private class Tree(val height: Int, val position: Position, private val gridLength: Int) {
     fun isOnEdge() =

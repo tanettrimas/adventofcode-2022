@@ -43,4 +43,17 @@ internal class TreeStructureTest {
         val treeStructure = TreeStructure(input)
         assertEquals(21, treeStructure.visible())
     }
+
+    @Test
+    fun `gives correct scienic score`() {
+        val input = """
+            30373
+            25512
+            65332
+            33549
+            35390
+        """.trimMargin()
+        val treeStructure = TreeStructure(input)
+        assertEquals(8, treeStructure.scienicScore())
+    }
 }

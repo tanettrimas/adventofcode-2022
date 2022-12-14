@@ -45,6 +45,29 @@ class TreeStructure(input: String) {
     }
 
     private fun isVisible(tree: Tree): Boolean {
+        val directions = getDirections(tree)
+        return (directions.left.none { isTreeHigher(it, tree) }
+                || directions.right.none { isTreeHigher(it, tree) }
+                || directions.top.none { isTreeHigher(it, tree) }
+                || directions.bottom.none { isTreeHigher(it, tree) })
+    }
+
+    private fun isTreeHigher(rowTree: Tree, comparingTree: Tree) = rowTree.height >= comparingTree.height
+
+    fun scienicScore(): Int {
+        val flattenedTrees = trees.flatten()
+        val max = flattenedTrees.maxOf {tree ->
+            val directions = getDirections(tree)
+            val viewingTop = viewingDistance(tree, directions.top.reversed())
+            val viewingBottom = viewingDistance(tree, directions.bottom)
+            val viewingRight = viewingDistance(tree, directions.right)
+            val viewingLeft = viewingDistance(tree, directions.left.reversed())
+            viewingTop * viewingBottom * viewingLeft * viewingRight
+        }
+        return max
+    }
+
+    private fun getDirections(tree: Tree): Directions {
         val row = row(tree.position)
         val column = column(tree.position)
 
@@ -52,15 +75,28 @@ class TreeStructure(input: String) {
         val right = row.slice(tree.right())
         val top = column.slice(tree.top())
         val bottom = column.slice(tree.bottom())
-        return (left.none { isTreeHigher(it, tree) }
-                || right.none { isTreeHigher(it, tree) }
-                || top.none { isTreeHigher(it, tree) }
-                || bottom.none { isTreeHigher(it, tree) })
+        return Directions(top = top, bottom = bottom, left = left, right = right)
     }
 
-    private fun isTreeHigher(rowTree: Tree, comparingTree: Tree) = rowTree.height >= comparingTree.height
+    private fun viewingDistance(tree: Tree, list: List<Tree>): Int {
+        var distance = 0
+        run breaking@ {
+            list.forEach {
+                if (it.height >= tree.height) {
+                    distance++
+                    return@breaking
+                }
+                distance++
+            }
+        }
+
+        return distance
+    }
+
     fun visible() = visibleEdges() + visibleInterior()
 }
+
+private class Directions(val top: List<Tree>, val bottom: List<Tree>, val left: List<Tree>, val right: List<Tree>)
 
 private class Tree(val height: Int, val position: Position, private val gridLength: Int) {
     fun isOnEdge() =

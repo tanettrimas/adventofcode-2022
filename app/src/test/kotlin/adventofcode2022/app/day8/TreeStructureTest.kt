@@ -30,4 +30,17 @@ internal class TreeStructureTest {
         val treeStructure = TreeStructure(input)
         assertEquals(5, treeStructure.visibleInterior())
     }
+
+    @Test
+    fun `gives correct total visibility`() {
+        val input = """
+            30373
+            25512
+            65332
+            33549
+            35390
+        """.trimMargin()
+        val treeStructure = TreeStructure(input)
+        assertEquals(21, treeStructure.visible())
+    }
 }

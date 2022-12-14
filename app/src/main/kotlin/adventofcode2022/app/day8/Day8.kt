@@ -74,4 +74,5 @@ class TreeStructure(input: String) {
     }
 
     private fun isTreeHigher(rowTree: Tree, comparingTree: Tree) = rowTree.height >= comparingTree.height
+    fun visible() = visibleEdges() + visibleInterior()
 }
